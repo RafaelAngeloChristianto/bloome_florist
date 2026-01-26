@@ -37,7 +37,7 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button 
-              onClick={() => setCurrentPage?.('shop')} 
+              onClick={() => setCurrentPage?.('catalogues')} 
               className="px-10 py-4 rounded-2xl text-lg font-semibold text-white bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105"
             >
               View Collection
