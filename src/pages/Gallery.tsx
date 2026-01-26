@@ -178,11 +178,27 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
         filtered.sort((a, b) => b.id - a.id)
         break
       default:
-        // Featured products first, then by ID
+        // Default: alphabetical/numerical order by image filename
         filtered.sort((a, b) => {
-          if (a.isFeatured && !b.isFeatured) return -1
-          if (!a.isFeatured && b.isFeatured) return 1
-          return a.id - b.id
+          // Extract filename from image path for sorting
+          const getFileName = (imagePath: string) => {
+            const parts = imagePath.split('/')
+            return parts[parts.length - 1] || ''
+          }
+          
+          const fileNameA = getFileName(a.image)
+          const fileNameB = getFileName(b.image)
+          
+          // For numerical filenames (like 1.jpeg, 2.jpeg), sort numerically
+          const numA = parseInt(fileNameA.match(/^(\d+)/)?.[1] || '0')
+          const numB = parseInt(fileNameB.match(/^(\d+)/)?.[1] || '0')
+          
+          if (!isNaN(numA) && !isNaN(numB) && numA !== numB) {
+            return numA - numB
+          }
+          
+          // Otherwise sort alphabetically
+          return fileNameA.localeCompare(fileNameB)
         })
     }
     
@@ -671,23 +687,54 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
                 </div>
                 
                 <div className="space-y-4">
-                  <div className="p-4 rounded-xl bg-rose-50 border border-rose-100">
-                    <h4 className="font-semibold text-gray-800 mb-2">What's Included</h4>
-                    <ul className="space-y-2 text-gray-600">
-                      <li className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-rose-500" />
-                        Handcrafted floral arrangement
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-rose-500" />
-                        Premium seasonal flowers
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-rose-500" />
-                        Professional delivery available
-                      </li>
-                    </ul>
-                  </div>
+                  {selectedProduct.category === 'Money Bouquet' ? (
+                    <div className="p-4 rounded-xl bg-green-50 border border-green-100">
+                      <h4 className="font-semibold text-gray-800 mb-3">PEMBUATAN BUKET</h4>
+                      <div className="grid grid-cols-2 gap-2 text-sm mb-4">
+                        <div>10 lembar = Rp 100.000</div>
+                        <div>15 lembar = Rp 125.000</div>
+                        <div>20 lembar = Rp 150.000</div>
+                        <div>25 lembar = Rp 175.000</div>
+                        <div>30 lembar = Rp 200.000</div>
+                        <div>40 lembar = Rp 250.000</div>
+                        <div>50 lembar = Rp 350.000</div>
+                        <div>60 lembar = Rp 375.000</div>
+                      </div>
+                      <div className="border-t border-green-200 pt-3">
+                        <h5 className="font-medium mb-2">CONTOH</h5>
+                        <div className="text-sm space-y-2">
+                          <div className="p-2 bg-white rounded">
+                            <p>Pesan Total Uang Rp 200.000 pakai uang pecahan Rp 10.000</p>
+                            <p>→ Biaya jasa 20 lembar : Rp 150.000</p>
+                            <p>→ Jasa + Uang dalam buket = Rp 150.000 + Rp 200.000 = Rp 350.000</p>
+                          </div>
+                          <div className="p-2 bg-white rounded">
+                            <p>Pesan Total Uang Rp 3 Juta pakai uang pecahan Rp 100.000</p>
+                            <p>→ Biaya jasa 30 lembar : Rp 200.000</p>
+                            <p>→ Jasa + Uang dalam buket = Rp 200.000 + Rp 3.000.000 = Rp 3.200.000</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-xl bg-rose-50 border border-rose-100">
+                      <h4 className="font-semibold text-gray-800 mb-2">What's Included</h4>
+                      <ul className="space-y-2 text-gray-600">
+                        <li className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-rose-500" />
+                          Handcrafted floral arrangement
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-rose-500" />
+                          Premium seasonal flowers
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-2 h-2 rounded-full bg-rose-500" />
+                          Professional delivery available
+                        </li>
+                      </ul>
+                    </div>
+                  )}
                   
                   <div className="p-4 rounded-xl bg-pink-50 border border-pink-100">
                     <h4 className="font-semibold text-gray-800 mb-2">Customization Options</h4>

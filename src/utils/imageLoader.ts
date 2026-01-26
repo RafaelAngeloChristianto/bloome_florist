@@ -6,7 +6,8 @@ export const getImagesFromFolder = (folderName: string) => {
     const modules = import.meta.glob('../assets/**/*.{png,jpg,jpeg,webp,PNG,JPG,JPEG,WEBP}', { eager: true })
     
     Object.entries(modules).forEach(([path, module]) => {
-      if (path.includes(folderName)) {
+      const normalizedPath = path.replace(/\\/g, '/')
+      if (normalizedPath.includes(folderName)) {
         const fileName = path.split('/').pop() || ''
         images[fileName] = (module as any).default
       }
