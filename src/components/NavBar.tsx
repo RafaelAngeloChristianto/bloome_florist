@@ -12,7 +12,7 @@ const NavBar: React.FC<NavBarProps> = ({ currentPage, setCurrentPage }) => {
   const [isFlowersOpen, setIsFlowersOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMobileBouquetOpen, setIsMobileBouquetOpen] = useState(false)
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024)
+  const [isDesktop, setIsDesktop] = useState<boolean>(window.innerWidth >= 1024)
   const [catalogueItems, setCatalogueItems] = useState<Array<{name: string, desc: string}>>([])
 
   const dropdownRef = useRef<HTMLDivElement>(null)

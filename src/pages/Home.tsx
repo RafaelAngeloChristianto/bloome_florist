@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import bouquetImage from '../assets/bouquet_homepage.jpeg'
 
 interface HomeProps {

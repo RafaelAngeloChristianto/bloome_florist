@@ -417,7 +417,6 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
                     </button>
                     <button
                       onClick={() => {
-                        const featuredProducts = products.filter(p => p.isFeatured)
                         // For demo, you could set a state for featured filter
                         // This is a placeholder for actual featured filter implementation
                       }}
