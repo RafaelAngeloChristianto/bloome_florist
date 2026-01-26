@@ -27,7 +27,6 @@ const NavBar: React.FC<NavBarProps> = ({ currentPage, setCurrentPage }) => {
     setCatalogueItems(items)
   }, [])
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       // If clicking outside both the dropdown and the button
@@ -51,7 +50,6 @@ const NavBar: React.FC<NavBarProps> = ({ currentPage, setCurrentPage }) => {
     }
   }, [isFlowersOpen])
 
-  // Update desktop/mobile state on resize
   useEffect(() => {
     const handleResize = () => {
       const desktop = window.innerWidth >= 1024

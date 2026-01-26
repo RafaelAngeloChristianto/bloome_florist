@@ -53,7 +53,7 @@ export const generateProductsFromAssets = () => {
   categories.forEach(category => {
     const images = getImagesFromFolder(category)
     
-    Object.entries(images).forEach(([fileName, imagePath]) => {
+    Object.entries(images).forEach(([, imagePath]) => {
       products.push({
         id: productId++,
         category,

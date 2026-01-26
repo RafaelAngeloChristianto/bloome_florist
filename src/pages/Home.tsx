@@ -6,13 +6,6 @@ interface HomeProps {
 }
 
 const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
-  const [isFlowersOpen, setIsFlowersOpen] = useState(false)
-
-  const categories = [
-    'Balloon (Best Seller)', 'Chocolate & Snack', 'Fresh', 'Frame', 'Christmas', 'CNY',
-    'Eid Mubarak', 'Hari Ibu', 'Valentine', 'Vase', 'Baby', 'Hijab',
-    'Standing Flower', 'Bloombox', 'Papan Bunga', 'Sculpture', 'Stationery'
-  ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50">

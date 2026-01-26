@@ -6,35 +6,6 @@ interface AboutProps {
 }
 
 const About: React.FC<AboutProps> = ({ setCurrentPage }) => {
-  const values = [
-    {
-      title: 'Quality',
-      description: 'We source only the finest, freshest flowers from trusted growers worldwide.',
-      color: 'from-rose-500 to-pink-500'
-    },
-    {
-      title: 'Craftsmanship',
-      description: 'Each arrangement is meticulously crafted by our skilled floral artisans.',
-      color: 'from-amber-500 to-orange-500'
-    },
-    {
-      title: 'Service',
-      description: 'Exceptional customer service and attention to detail in every interaction.',
-      color: 'from-green-500 to-emerald-500'
-    },
-    {
-      title: 'Innovation',
-      description: 'Constantly evolving our designs to bring you the latest floral trends.',
-      color: 'from-purple-500 to-pink-500'
-    }
-  ]
-
-  const team = [
-    { name: 'Sarah Johnson', role: 'Master Florist & Founder', experience: '15+ years' },
-    { name: 'Michael Chen', role: 'Creative Director', experience: '12+ years' },
-    { name: 'Emma Rodriguez', role: 'Wedding Specialist', experience: '8+ years' },
-    { name: 'David Kim', role: 'Event Coordinator', experience: '10+ years' }
-  ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50 pt-20">

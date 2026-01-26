@@ -22,10 +22,6 @@ const Shop: React.FC<ShopProps> = ({ setCurrentPage }) => {
     setCategories(['All', ...availableCategories])
     setProducts(generateProductsFromAssets())
   }, [])
-  
-  const catalogues = [
-    { name: 'Money Bouquet', component: 'money' },
-  ]
 
   const filteredProducts = selectedCategory === 'All' 
     ? products 

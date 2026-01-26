@@ -6,7 +6,7 @@ interface ContactProps {
   setCurrentPage?: (page: string) => void;
 }
 
-const Contact: React.FC<ContactProps> = ({ setCurrentPage }) => {
+const Contact: React.FC<ContactProps> = () => {
   const [isHovered, setIsHovered] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
