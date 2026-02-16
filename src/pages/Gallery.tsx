@@ -596,7 +596,7 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
       )}
 
       {/* Styles */}
-      <style jsx>{`
+      <style>{`
         .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;

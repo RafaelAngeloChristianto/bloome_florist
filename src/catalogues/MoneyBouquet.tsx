@@ -28,18 +28,7 @@ const MoneyBouquet = () => {
     { sheets: 60, price: 'Rp 375.000' }
   ]
 
-  const examples = [
-    {
-      order: 'Total Uang Rp 200.000 pakai uang pecahan Rp 10.000',
-      service: 'Biaya jasa 20 lembar : Rp 150.000',
-      total: 'Jasa + Uang dalam buket = Rp 150.000 + Rp 200.000 = Rp 350.000'
-    },
-    {
-      order: 'Total Uang Rp 3 Juta pakai uang pecahan Rp 100.000',
-      service: 'Biaya jasa 30 lembar : Rp 200.000',
-      total: 'Jasa + Uang dalam buket = Rp 200.000 + Rp 3.000.000 = Rp 3.200.000'
-    }
-  ]
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-amber-50 pt-20">
