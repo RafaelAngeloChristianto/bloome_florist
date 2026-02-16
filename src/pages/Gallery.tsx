@@ -1,755 +1,716 @@
-import React, { useState, useEffect, useMemo } from 'react'
-import { getAvailableCategories, generateProductsFromAssets } from '../utils/imageLoader'
-import { 
-  Search, Filter, X, ChevronRight, 
-  ShoppingBag, ZoomIn, Sparkles, Grid, List 
-} from 'lucide-react'
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  getAvailableCategories,
+  generateProductsFromAssets,
+} from "../utils/imageLoader";
 
 interface GalleryProps {
-  setCurrentPage?: (page: string) => void
-}
-
-interface Product {
-  id: number
-  category: string
-  image: string
-  title: string
-  price: number
-  description: string
-  isFeatured: boolean
-}
-
-interface SortOption {
-  label: string
-  value: string
-  icon: React.ReactNode
-}
-
-// Product title dictionary
-const productTitles = [
-  "Elegant Rose Bouquet",
-  "Classic Lily Arrangement",
-  "Sunflower Paradise",
-  "Orchid Elegance",
-  "Tulip Symphony",
-  "Lavender Dream",
-  "Carnation Delight",
-  "Daisy Meadow",
-  "Peony Perfection",
-  "Hydrangea Harmony",
-  "Gerbera Joy",
-  "Alstroemeria Beauty",
-  "Chrysanthemum Classic",
-  "Iris Inspiration",
-  "Anemone Charm",
-  "Ranunculus Romance",
-  "Freesia Fantasy",
-  "Statice Serenity",
-  "Gypsophila Cloud",
-  "Protea Majesty"
-]
-
-// Product description dictionary
-const productDescriptions = [
-  "Beautiful handcrafted arrangement perfect for special occasions",
-  "Fresh seasonal flowers arranged by our expert florists",
-  "Elegant design that brings natural beauty to any space",
-  "Carefully selected premium blooms for lasting freshness",
-  "Artistic floral composition with perfect color harmony",
-  "Luxury arrangement featuring the finest quality flowers",
-  "Modern floral design with timeless elegance",
-  "Romantic bouquet that captures hearts",
-  "Vibrant colors that brighten any room",
-  "Sophisticated arrangement for corporate events",
-  "Charming bouquet for celebrations and gifts",
-  "Professional floral design for weddings",
-  "Exquisite centerpiece for dining tables",
-  "Thoughtful gift arrangement for loved ones",
-  "Minimalist yet impactful floral art",
-  "Lush bouquet with mixed seasonal varieties",
-  "Premium arrangement with imported flowers",
-  "Sustainable locally-sourced flower composition",
-  "Customizable design to match your preferences",
-  "Signature arrangement from our master florist"
-]
-
-// Round prices to nearest 5,000 or 10,000 IDR
-const generateRealisticPrice = (index: number): number => {
-  // Base price between 250,000 and 500,000
-  const basePrice = 250000 + (index % 10) * 25000; // Creates variety
-  
-  // Round to nearest 5,000
-  const roundedPrice = Math.round(basePrice / 5000) * 5000;
-  
-  // Ensure it's between 250k and 500k
-  return Math.min(Math.max(roundedPrice, 250000), 500000);
+  setCurrentPage?: (page: string) => void;
 }
 
 const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
-  const [categories, setCategories] = useState<string[]>([])
-  const [products, setProducts] = useState<Product[]>([])
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [sortBy, setSortBy] = useState('default')
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
-  const [showFilters, setShowFilters] = useState(false)
-  const [priceRange, setPriceRange] = useState<[number, number]>([250000, 500000])
-  const [isLoading, setIsLoading] = useState(true)
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [categories, setCategories] = useState<string[]>(["All"]);
+  const [products, setProducts] = useState<
+    Array<{
+      id: number;
+      category: string;
+      image: string;
+      name: string;
+    }>
+  >([]);
 
-  // Sort options
-  const sortOptions: SortOption[] = [
-    { label: 'Default', value: 'default', icon: <Sparkles size={16} /> },
-    { label: 'Price: Low to High', value: 'price-asc', icon: <ChevronRight size={16} /> },
-    { label: 'Price: High to Low', value: 'price-desc', icon: <ChevronRight size={16} className="rotate-180" /> },
-    { label: 'Newest First', value: 'newest', icon: <Sparkles size={16} /> },
-  ]
+  // Preview modal state
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [currentPreviewIndex, setCurrentPreviewIndex] = useState(0);
+  const [filteredProducts, setFilteredProducts] = useState(products);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadProducts = async () => {
-      setIsLoading(true)
-      try {
-        const availableCategories = getAvailableCategories()
-        const generatedProducts = generateProductsFromAssets()
-        
-        // Map to proper product objects with realistic data
-        const productsData: Product[] = generatedProducts.map((product, index) => {
-          const titleIndex = index % productTitles.length;
-          const descIndex = index % productDescriptions.length;
-          
-          return {
-            id: index + 1,
-            category: product.category || 'Uncategorized',
-            image: product.image,
-            title: productTitles[titleIndex],
-            price: generateRealisticPrice(index),
-            description: productDescriptions[descIndex],
-            isFeatured: index < 5 || index % 7 === 0 // First 5 and every 7th product are featured
-          }
-        })
-        
-        setCategories(availableCategories)
-        setProducts(productsData)
-      } catch (error) {
-        console.error('Error loading products:', error)
-      } finally {
-        setIsLoading(false)
+    const availableCategories = getAvailableCategories();
+    setCategories(["All", ...availableCategories]);
+    const loadedProducts = generateProductsFromAssets();
+    setProducts(loadedProducts);
+    setIsLoading(false);
+  }, []);
+
+  // Update filtered products when category or products change
+  useEffect(() => {
+    const filtered =
+      selectedCategory === "All"
+        ? products
+        : products.filter(
+            (product) => product.category.trim() === selectedCategory.trim(),
+          );
+    setFilteredProducts(filtered);
+  }, [selectedCategory, products]);
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!previewOpen) return;
+
+      if (e.key === "ArrowLeft") {
+        navigatePreview("prev");
+      } else if (e.key === "ArrowRight") {
+        navigatePreview("next");
+      } else if (e.key === "Escape") {
+        setPreviewOpen(false);
       }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [previewOpen, currentPreviewIndex, filteredProducts]);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (previewOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
     }
-    
-    loadProducts()
-  }, [])
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [previewOpen]);
 
-  const filteredProducts = useMemo(() => {
-    let filtered = products
-    
-    // Filter by category
-    if (selectedCategory) {
-      filtered = filtered.filter(product => 
-        product.category.trim().toLowerCase() === selectedCategory.trim().toLowerCase()
-      )
-    }
-    
-    // Filter by search
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(product => 
-        product.title.toLowerCase().includes(query) ||
-        product.category.toLowerCase().includes(query) ||
-        product.description.toLowerCase().includes(query)
-      )
-    }
-    
-    // Filter by price range
-    filtered = filtered.filter(product => 
-      product.price >= priceRange[0] && 
-      product.price <= priceRange[1]
-    )
-    
-    // Sort products
-    switch (sortBy) {
-      case 'price-asc':
-        filtered.sort((a, b) => a.price - b.price)
-        break
-      case 'price-desc':
-        filtered.sort((a, b) => b.price - a.price)
-        break
-      case 'newest':
-        filtered.sort((a, b) => b.id - a.id)
-        break
-      default:
-        // Default: alphabetical/numerical order by image filename
-        filtered.sort((a, b) => {
-          // Extract filename from image path for sorting
-          const getFileName = (imagePath: string) => {
-            const parts = imagePath.split('/')
-            return parts[parts.length - 1] || ''
-          }
-          
-          const fileNameA = getFileName(a.image)
-          const fileNameB = getFileName(b.image)
-          
-          // For numerical filenames (like 1.jpeg, 2.jpeg), sort numerically
-          const numA = parseInt(fileNameA.match(/^(\d+)/)?.[1] || '0')
-          const numB = parseInt(fileNameB.match(/^(\d+)/)?.[1] || '0')
-          
-          if (!isNaN(numA) && !isNaN(numB) && numA !== numB) {
-            return numA - numB
-          }
-          
-          // Otherwise sort alphabetically
-          return fileNameA.localeCompare(fileNameB)
-        })
-    }
-    
-    return filtered
-  }, [products, selectedCategory, searchQuery, sortBy, priceRange])
+  const openPreview = (index: number) => {
+    setCurrentPreviewIndex(index);
+    setPreviewOpen(true);
+  };
 
-  const handleQuickView = (product: Product) => {
-    setSelectedProduct(product)
-    document.body.style.overflow = 'hidden'
-  }
+  const navigatePreview = useCallback(
+    (direction: "prev" | "next") => {
+      setCurrentPreviewIndex((prev) => {
+        if (direction === "prev") {
+          return prev === 0 ? filteredProducts.length - 1 : prev - 1;
+        } else {
+          return prev === filteredProducts.length - 1 ? 0 : prev + 1;
+        }
+      });
+    },
+    [filteredProducts.length],
+  );
 
-  const closeQuickView = () => {
-    setSelectedProduct(null)
-    document.body.style.overflow = 'auto'
-  }
-
-  const handleInquiry = (product?: Product) => {
-    if (product) {
-      localStorage.setItem('selectedProduct', JSON.stringify(product))
-    }
-    setCurrentPage?.('contact')
-  }
-
-  // Format IDR currency
-  const formatIDR = (amount: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount)
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50 pt-20 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-r from-rose-200 to-pink-200 animate-pulse flex items-center justify-center">
-            <Sparkles className="text-rose-500 animate-spin" size={32} />
-          </div>
-          <p className="text-lg text-gray-600">Loading beautiful arrangements...</p>
-        </div>
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement;
+    target.style.display = "none";
+    target.parentElement!.innerHTML = `
+      <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-pink-50 to-pink-100">
+        <svg class="w-16 h-16 text-pink-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
       </div>
-    )
-  }
+    `;
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50 pt-20">
-      {/* Hero Section with Search */}
-      <div className="relative py-16 px-6">
-        <div className="absolute inset-0 bg-gradient-to-r from-rose-500/5 via-transparent to-pink-500/5" />
-        <div className="max-w-6xl mx-auto relative">
-          <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              Our
-              <span className="block bg-gradient-to-r from-rose-600 via-pink-600 to-rose-600 bg-clip-text text-transparent animate-gradient-x">
-                Gallery
-              </span>
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Discover our stunning collection of handcrafted floral arrangements
-            </p>
-            
-            {/* Search Bar */}
-            <div className="max-w-2xl mx-auto mb-8">
-              <div className="relative group">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-rose-500 transition-colors" size={20} />
-                <input
-                  type="text"
-                  placeholder="Search arrangements..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/80 backdrop-blur-sm border border-white/20 shadow-lg focus:outline-none focus:ring-2 focus:ring-rose-500/50 focus:border-transparent transition-all"
-                />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-rose-500 transition-colors"
+    <>
+      <div className="min-h-screen bg-gradient-to-b from-pink-50 via-white to-pink-50">
+        {/* Hero Section - Enhanced with pink floral elements */}
+        <div className="relative pt-20 overflow-hidden">
+          {/* Decorative Floral Elements */}
+          <div className="absolute top-0 left-0 w-full h-96 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-pink-200/40 via-pink-100/20 to-transparent"></div>
+
+          {/* Floating Petals */}
+          <div className="absolute top-40 left-[10%] w-32 h-32 bg-pink-200/30 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute top-60 right-[15%] w-40 h-40 bg-pink-300/30 rounded-full blur-3xl animate-float-delayed"></div>
+          <div className="absolute bottom-20 left-[20%] w-36 h-36 bg-pink-200/20 rounded-full blur-3xl animate-float-slow"></div>
+
+          {/* Decorative Lines */}
+          <div className="absolute top-0 left-0 w-64 h-px bg-gradient-to-r from-transparent via-pink-300 to-transparent rotate-45 translate-x-20"></div>
+          <div className="absolute bottom-0 right-0 w-64 h-px bg-gradient-to-r from-transparent via-pink-400 to-transparent -rotate-45 -translate-x-20"></div>
+
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
+            <div className="text-center">
+              {/* Refined Header with Bloom */}
+              <div className="inline-flex items-center gap-3 sm:gap-4 text-pink-400 mb-6">
+                <span className="w-12 sm:w-16 h-px bg-gradient-to-r from-transparent via-pink-300 to-pink-400"></span>
+                <div className="relative">
+                  <svg
+                    className="w-6 h-6 text-pink-300 animate-pulse-slow"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
                   >
-                    <X size={20} />
-                  </button>
-                )}
+                    <path d="M12 2C8 2 4 5 4 9c0 2.5 1.5 5 4 7-1 2-3 4-3 4h14s-2-2-3-4c2.5-2 4-4.5 4-7 0-4-4-7-8-7z" />
+                  </svg>
+                </div>
+                <span className="text-xs sm:text-sm uppercase tracking-[0.3em] font-light text-pink-400">
+                  BLOOME
+                </span>
+                <div className="relative">
+                  <svg
+                    className="w-6 h-6 text-pink-300 animate-pulse-slow"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 2C8 2 4 5 4 9c0 2.5 1.5 5 4 7-1 2-3 4-3 4h14s-2-2-3-4c2.5-2 4-4.5 4-7 0-4-4-7-8-7z" />
+                  </svg>
+                </div>
+                <span className="w-12 sm:w-16 h-px bg-gradient-to-l from-transparent via-pink-300 to-pink-400"></span>
               </div>
-            </div>
-          </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <p className="text-sm text-gray-500">Total Items</p>
-              <p className="text-2xl font-bold text-gray-800">{products.length}</p>
-            </div>
-            <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <p className="text-sm text-gray-500">Categories</p>
-              <p className="text-2xl font-bold text-gray-800">{categories.length}</p>
-            </div>
-            <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <p className="text-sm text-gray-500">Price Range</p>
-              <p className="text-2xl font-bold text-gray-800">IDR 250K-500K</p>
-            </div>
-            <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <p className="text-sm text-gray-500">Filtered</p>
-              <p className="text-2xl font-bold text-gray-800">{filteredProducts.length}</p>
+              <h1 className="text-5xl sm:text-6xl md:text-8xl font-light text-gray-800 mb-6 tracking-tight">
+                Floral
+                <span className="text-pink-400 block sm:inline sm:ml-4 font-serif italic">
+                  Gallery
+                </span>
+              </h1>
+
+              <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed px-4 font-light italic">
+                "For over a decade, we've been creating moments of beauty and
+                joy through the art of floral design"
+              </p>
+
+              <div className="mt-10 flex justify-center">
+                <div className="flex items-center gap-3 px-4 py-2 bg-white/50 backdrop-blur-sm rounded-full border border-pink-200/50">
+                  <svg
+                    className="w-5 h-5 text-pink-400"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <span className="text-sm text-gray-600">
+                    {filteredProducts.length} unique arrangements
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Controls Bar */}
-      <div className="sticky top-20 z-10 bg-white/80 backdrop-blur-sm border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white hover:from-rose-600 hover:to-pink-600 transition-all"
-              >
-                <Filter size={18} />
-                Filters
-              </button>
-              
-              {/* View Toggle */}
-              <div className="flex bg-white/50 rounded-xl p-1">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-lg transition-all ${
-                    viewMode === 'grid' 
-                      ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white' 
-                      : 'text-gray-600 hover:text-rose-600'
-                  }`}
-                >
-                  <Grid size={20} />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-lg transition-all ${
-                    viewMode === 'list' 
-                      ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white' 
-                      : 'text-gray-600 hover:text-rose-600'
-                  }`}
-                >
-                  <List size={20} />
-                </button>
-              </div>
-            </div>
-            
-            {/* Sort Dropdown */}
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+          {/* Section Title with Floral Accent */}
+          <div className="flex items-center gap-4 sm:gap-8 mb-10 sm:mb-16">
             <div className="relative">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 rounded-xl bg-white/50 backdrop-blur-sm border border-white/20 appearance-none pr-10 focus:outline-none focus:ring-2 focus:ring-rose-500/50"
-              >
-                {sortOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    Sort: {option.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronRight className="absolute right-3 top-1/2 transform -translate-y-1/2 rotate-90 text-gray-400" size={16} />
-            </div>
-          </div>
-
-          {/* Filters Panel */}
-          {showFilters && (
-            <div className="mt-4 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 animate-slideDown">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Price Range: {formatIDR(priceRange[0])} - {formatIDR(priceRange[1])}
-                  </label>
-                  <input
-                    type="range"
-                    min="250000"
-                    max="500000"
-                    step="5000"
-                    value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                    className="w-full h-2 bg-gradient-to-r from-rose-200 to-pink-200 rounded-lg appearance-none cursor-pointer"
-                  />
-                  <div className="flex justify-between text-sm text-gray-500 mt-2">
-                    <span>{formatIDR(250000)}</span>
-                    <span>{formatIDR(375000)}</span>
-                    <span>{formatIDR(500000)}</span>
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Categories
-                  </label>
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
-                    <button
-                      onClick={() => setSelectedCategory(null)}
-                      className={`block w-full text-left px-3 py-2 rounded-lg transition-all ${
-                        selectedCategory === null
-                          ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white'
-                          : 'hover:bg-rose-50'
-                      }`}
-                    >
-                      All Categories
-                    </button>
-                    {categories.map((category) => (
-                      <button
-                        key={category}
-                        onClick={() => setSelectedCategory(category)}
-                        className={`block w-full text-left px-3 py-2 rounded-lg transition-all ${
-                          selectedCategory === category
-                            ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white'
-                            : 'hover:bg-rose-50'
-                        }`}
-                      >
-                        {category}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Quick Actions
-                  </label>
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => {
-                        setPriceRange([250000, 350000])
-                        setSelectedCategory(null)
-                      }}
-                      className="w-full px-4 py-2 text-left rounded-lg bg-gradient-to-r from-rose-50 to-pink-50 hover:from-rose-100 hover:to-pink-100 transition-all"
-                    >
-                      Budget Friendly (under {formatIDR(350000)})
-                    </button>
-                    <button
-                      onClick={() => {
-                        // For demo, you could set a state for featured filter
-                        // This is a placeholder for actual featured filter implementation
-                      }}
-                      className="w-full px-4 py-2 text-left rounded-lg bg-gradient-to-r from-rose-50 to-pink-50 hover:from-rose-100 hover:to-pink-100 transition-all"
-                    >
-                      Featured Only
-                    </button>
-                  </div>
-                </div>
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-100 to-pink-200 flex items-center justify-center">
+                <svg
+                  className="w-6 h-6 text-pink-400"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 2C8 2 4 5 4 9c0 2.5 1.5 5 4 7-1 2-3 4-3 4h14s-2-2-3-4c2.5-2 4-4.5 4-7 0-4-4-7-8-7z" />
+                </svg>
               </div>
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Categories Quick Select */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex flex-wrap gap-3 justify-center">
-          <button
-            onClick={() => setSelectedCategory(null)}
-            className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 flex items-center gap-2 ${
-              selectedCategory === null
-                ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/25'
-                : 'bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-gradient-to-r hover:from-rose-50 hover:to-pink-50 border border-white/20 hover:border-rose-200'
-            }`}
-          >
-            <Sparkles size={16} />
-            All ({products.length})
-          </button>
-          
-          {categories.slice(0, 8).map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-6 py-3 rounded-full backdrop-blur-sm border transition-all duration-300 group flex items-center gap-2 ${
-                selectedCategory === category
-                  ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/25 border-transparent'
-                  : 'bg-white/80 border-white/20 hover:bg-gradient-to-br hover:from-rose-50 hover:to-pink-50 hover:border-rose-200'
-              }`}
-            >
-              <span className={`font-semibold transition-colors ${
-                selectedCategory === category
-                  ? 'text-white'
-                  : 'text-gray-800 group-hover:text-rose-600'
-              }`}>
-                {category}
-              </span>
-              <span className={`text-sm px-2 py-1 rounded-full ${
-                selectedCategory === category
-                  ? 'bg-white/20 text-white'
-                  : 'bg-rose-50 text-rose-600'
-              }`}>
-                {products.filter(p => p.category.trim() === category.trim()).length}
-              </span>
-            </button>
-          ))}
-          
-          {categories.length > 8 && (
-            <button
-              onClick={() => setShowFilters(true)}
-              className="px-6 py-3 rounded-full bg-white/80 backdrop-blur-sm border border-white/20 text-gray-700 hover:bg-gradient-to-r hover:from-rose-50 hover:to-pink-50 hover:border-rose-200 transition-all flex items-center gap-2"
-            >
-              More
-              <ChevronRight size={16} />
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Gallery Grid/List */}
-      <div className="max-w-7xl mx-auto px-6 pb-20">
-        {filteredProducts.length === 0 ? (
-          <div className="text-center py-20">
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-rose-100 to-pink-100 flex items-center justify-center">
-              <Search className="text-rose-400" size={32} />
-            </div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-3">No arrangements found</h3>
-            <p className="text-gray-600 mb-6">Try adjusting your filters or search terms</p>
-            <button
-              onClick={() => {
-                setSearchQuery('')
-                setSelectedCategory(null)
-                setPriceRange([250000, 500000])
-              }}
-              className="px-6 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold hover:from-rose-600 hover:to-pink-600 transition-all"
-            >
-              Reset Filters
-            </button>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-light text-gray-800 tracking-tight">
+              Our Collections
+            </h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-pink-200 via-pink-300 to-transparent"></div>
+            <span className="text-sm text-pink-500 font-light bg-pink-50/80 backdrop-blur-sm px-4 py-2 rounded-full border border-pink-200">
+              {filteredProducts.length}{" "}
+              {filteredProducts.length === 1 ? "piece" : "pieces"}
+            </span>
           </div>
-        ) : (
-          <div className={`${viewMode === 'grid' 
-            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
-            : 'space-y-6'
-          } gap-6`}>
-            {filteredProducts.map((product) => (
-              <div
-                key={product.id}
-                className={`group cursor-pointer ${
-                  viewMode === 'list' 
-                    ? 'flex gap-6 bg-white/50 backdrop-blur-sm rounded-3xl p-6 border border-white/20 hover:border-rose-200 transition-all'
-                    : ''
-                }`}
-              >
-                {/* Product Image */}
-                <div className={`
-                  relative overflow-hidden rounded-3xl mb-4 transition-transform duration-500
-                  ${viewMode === 'list' ? 'w-48 h-48 flex-shrink-0' : 'aspect-square'}
-                  ${viewMode === 'grid' ? 'group-hover:scale-105' : ''}
-                `}>
-                  <div className="absolute inset-0 bg-gradient-to-br from-rose-100 to-pink-100" />
-                  <img 
-                    src={product.image} 
-                    alt={product.title}
-                    className="w-full h-full object-cover relative z-10"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement
-                      target.style.display = 'none'
-                    }}
-                  />
-                  
-                  {/* Image Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-20" />
-                  
-                  {/* Quick Actions */}
-                  <div className="absolute top-4 right-4 z-30 space-y-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => handleQuickView(product)}
-                      className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-all shadow-lg"
+
+          {/* Categories - Fixed 2-row grid */}
+          <div className="mb-16 sm:mb-24">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`relative px-4 py-3 text-sm font-light rounded-full transition-all duration-500 group ${
+                    selectedCategory === category
+                      ? "text-white shadow-lg shadow-pink-200"
+                      : "text-gray-600 hover:text-pink-500 bg-white/60 backdrop-blur-sm border border-pink-200 hover:border-pink-300 hover:bg-white/80"
+                  }`}
+                >
+                  {selectedCategory === category && (
+                    <span className="absolute inset-0 bg-gradient-to-r from-pink-400 to-pink-500 rounded-full animate-scaleIn"></span>
+                  )}
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    <span
+                      className={`${selectedCategory === category ? "text-white" : "text-pink-400"}`}
                     >
-                      <ZoomIn size={20} className="text-gray-600" />
-                    </button>
-                  </div>
-                  
-                  {product.isFeatured && (
-                    <div className="absolute top-4 left-4 z-30">
-                      <span className="px-3 py-1 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white text-xs font-semibold">
-                        Featured
+                      <svg
+                        className="w-4 h-4"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </span>
+                    {category}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Products Grid */}
+          {isLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="aspect-square bg-gradient-to-br from-pink-50 to-pink-100 rounded-3xl mb-4"></div>
+                  <div className="h-4 bg-pink-100 rounded w-3/4 mx-auto mb-2"></div>
+                  <div className="h-8 bg-pink-100 rounded-full w-32 mx-auto"></div>
+                </div>
+              ))}
+            </div>
+          ) : filteredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+              {filteredProducts.map((product, index) => (
+                <div
+                  key={product.id}
+                  className="group cursor-pointer animate-fadeInUp"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                  onClick={() => openPreview(index)}
+                >
+                  {/* Image Container - Refined */}
+                  <div className="relative aspect-square mb-5 overflow-hidden rounded-3xl bg-gradient-to-br from-pink-50 to-pink-100 shadow-md group-hover:shadow-2xl transition-all duration-700">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out"
+                      onError={handleImageError}
+                      loading="lazy"
+                    />
+
+                    {/* Elegant Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+
+                    {/* Category Badge - Refined */}
+                    <div className="absolute top-4 left-4">
+                      <span className="px-4 py-2 bg-white/90 backdrop-blur-sm text-xs font-light text-pink-500 rounded-full shadow-sm border border-white/50">
+                        {product.category}
                       </span>
                     </div>
-                  )}
-                </div>
-                
-                {/* Product Info */}
-                <div className={viewMode === 'list' ? 'flex-1' : ''}>
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="font-bold text-gray-800 text-lg mb-1">
-                        {product.title}
-                      </h3>
-                      <p className="text-gray-500 text-sm mb-2">
-                        {product.category}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-2xl bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
-                        {formatIDR(product.price)}
-                      </p>
-                      <p className="text-gray-400 text-sm">Starting from</p>
-                    </div>
-                  </div>
-                  
-                  <p className="text-gray-600 mb-4 line-clamp-2">
-                    {product.description}
-                  </p>
-                  
-                  <div className="flex gap-3">
-                    <button 
-                      onClick={() => handleInquiry(product)}
-                      className="flex-1 px-4 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold hover:from-rose-600 hover:to-pink-600 transition-all transform hover:scale-105 flex items-center justify-center gap-2"
-                    >
-                      <ShoppingBag size={18} />
-                      Inquire Now
-                    </button>
-                    <button 
-                      onClick={() => handleQuickView(product)}
-                      className="px-4 py-3 rounded-xl bg-white/80 backdrop-blur-sm border border-white/20 text-gray-700 hover:bg-gradient-to-r hover:from-rose-50 hover:to-pink-50 transition-all flex items-center gap-2"
-                    >
-                      <ZoomIn size={18} />
-                      {viewMode === 'grid' ? 'Quick View' : 'Details'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-        
-        {/* Load More Button */}
-        {filteredProducts.length > 0 && filteredProducts.length < products.length && (
-          <div className="text-center mt-12">
-            <button
-              className="px-8 py-4 rounded-2xl bg-gradient-to-r from-rose-50 to-pink-50 border border-rose-200 text-rose-600 font-semibold hover:from-rose-100 hover:to-pink-100 transition-all flex items-center gap-3 mx-auto group"
-            >
-              Load More Arrangements
-              <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
-        )}
-      </div>
 
-      {/* Quick View Modal */}
-      {selectedProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
-          <div 
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={closeQuickView}
-          />
-          <div className="relative bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white p-6 border-b flex justify-between items-center z-10">
-              <h2 className="text-2xl font-bold text-gray-800">
-                {selectedProduct.title}
-              </h2>
+                    {/* Hover Action - Elegant */}
+                    <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                      <div className="bg-white/90 backdrop-blur-md text-gray-800 text-sm py-4 text-center font-light border-t border-pink-100">
+                        <span className="flex items-center justify-center gap-2">
+                          <svg
+                            className="w-4 h-4 text-pink-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={1.5}
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={1.5}
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                            />
+                          </svg>
+                          Preview Arrangement
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Product Info - Refined */}
+                  <div className="text-center space-y-4">
+                    <h3 className="text-lg sm:text-xl text-gray-800 font-light group-hover:text-pink-500 transition-colors duration-300 line-clamp-1">
+                      {product.name}
+                    </h3>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentPage?.("contact");
+                      }}
+                      className="relative px-6 py-2.5 text-sm font-light rounded-full overflow-hidden group/btn transition-all duration-300 hover:scale-105 active:scale-95"
+                    >
+                      <span className="absolute inset-0 bg-gradient-to-r from-pink-400/10 to-pink-500/10 rounded-full opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></span>
+                      <span className="absolute inset-0 border border-pink-200 rounded-full group-hover/btn:border-pink-300 transition-colors duration-300"></span>
+                      <span className="relative z-10 text-pink-500 group-hover/btn:text-pink-600 transition-colors duration-300 flex items-center gap-2">
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={1.5}
+                            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                          />
+                        </svg>
+                        Inquire
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-32 bg-gradient-to-br from-pink-50/50 to-pink-100/50 rounded-3xl border border-pink-200">
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-pink-100 to-pink-200 mx-auto mb-6 flex items-center justify-center">
+                <svg
+                  className="w-12 h-12 text-pink-300"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 2C8 2 4 5 4 9c0 2.5 1.5 5 4 7-1 2-3 4-3 4h14s-2-2-3-4c2.5-2 4-4.5 4-7 0-4-4-7-8-7z" />
+                </svg>
+              </div>
+              <p className="text-xl text-gray-600 font-light mb-4">
+                No arrangements in this category
+              </p>
               <button
-                onClick={closeQuickView}
-                className="w-10 h-10 rounded-full bg-rose-50 hover:bg-rose-100 transition-colors flex items-center justify-center"
+                onClick={() => setSelectedCategory("All")}
+                className="text-pink-500 hover:text-pink-600 font-light transition-colors inline-flex items-center gap-2"
               >
-                <X size={20} className="text-rose-600" />
+                View all collections
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
               </button>
             </div>
-            
-            <div className="grid md:grid-cols-2 gap-8 p-8">
-              <div>
-                <div className="aspect-square rounded-2xl bg-gradient-to-br from-rose-100 to-pink-100 overflow-hidden mb-4">
-                  <img 
-                    src={selectedProduct.image} 
-                    alt={selectedProduct.title}
-                    className="w-full h-full object-cover"
-                  />
+          )}
+
+          {/* Help Section - Elegant */}
+          <div className="mt-32 lg:mt-40 relative">
+            {/* Decorative Background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-100/30 to-pink-200/30 rounded-3xl blur-3xl"></div>
+
+            {/* Floral Corner Decorations */}
+            <div className="absolute top-0 left-0 w-32 h-32 border-t-2 border-l-2 border-pink-200/50 rounded-tl-3xl"></div>
+            <div className="absolute bottom-0 right-0 w-32 h-32 border-b-2 border-r-2 border-pink-300/50 rounded-br-3xl"></div>
+
+            <div className="relative bg-white/70 backdrop-blur-xl rounded-3xl p-12 sm:p-16 lg:p-20 shadow-xl border border-white/60">
+              <div className="max-w-2xl mx-auto text-center">
+                <div className="inline-flex items-center gap-3 text-pink-400 mb-6">
+                  <span className="w-8 h-px bg-pink-300"></span>
+                  <span className="text-xs uppercase tracking-[0.2em] font-light">
+                    Expert Guidance
+                  </span>
+                  <span className="w-8 h-px bg-pink-300"></span>
                 </div>
+
+                <h3 className="text-3xl sm:text-4xl md:text-5xl font-light text-gray-800 mb-4 tracking-tight">
+                  Need help choosing?
+                </h3>
+
+                <p className="text-base sm:text-lg text-gray-600 mb-10 leading-relaxed font-light">
+                  Our floral experts are here to help you find the perfect
+                  arrangement for any occasion. Let's create something beautiful
+                  together.
+                </p>
+
                 <button
-                  onClick={() => handleInquiry(selectedProduct)}
-                  className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold hover:from-rose-600 hover:to-pink-600 transition-all"
+                  onClick={() => setCurrentPage?.("contact")}
+                  className="group relative inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-pink-400 to-pink-500 text-white rounded-full overflow-hidden shadow-lg shadow-pink-200/50 hover:shadow-xl hover:shadow-pink-300/50 transition-all duration-300 text-base"
                 >
-                  Request Custom Quote
+                  <span className="absolute inset-0 bg-gradient-to-r from-pink-500 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                  <span className="relative z-10 flex items-center gap-3">
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                    </svg>
+                    Contact Our Florists
+                    <svg
+                      className="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </span>
                 </button>
               </div>
-              
-              <div>
-                <div className="mb-6">
-                  <span className="inline-block px-4 py-1 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white text-sm font-semibold mb-4">
-                    {selectedProduct.category}
-                  </span>
-                  <h3 className="text-3xl font-bold text-gray-800 mb-4">
-                    {selectedProduct.title}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Image Preview Modal - Enhanced */}
+      {previewOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          onClick={() => setPreviewOpen(false)}
+        >
+          {/* Backdrop with floral blur */}
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-2xl transition-opacity animate-fadeIn"></div>
+
+          {/* Decorative Floral Elements */}
+          <div className="absolute top-20 left-20 w-72 h-72 bg-pink-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
+          <div className="absolute bottom-20 right-20 w-72 h-72 bg-pink-600/10 rounded-full blur-3xl animate-pulse-slow delay-1000"></div>
+
+          {/* Floating Petals */}
+          <div className="absolute top-40 left-[30%] w-4 h-4 bg-pink-300/30 rounded-full blur-sm animate-float"></div>
+          <div className="absolute bottom-40 right-[30%] w-6 h-6 bg-pink-400/30 rounded-full blur-sm animate-float-delayed"></div>
+
+          {/* Modal Content */}
+          <div
+            className="relative w-full max-w-6xl mx-auto animate-scaleIn"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close Button - Refined */}
+            <button
+              onClick={() => setPreviewOpen(false)}
+              className="absolute -top-16 right-0 text-white/40 hover:text-white transition-all z-20 p-3 hover:scale-110 group"
+              aria-label="Close preview"
+            >
+              <div className="relative">
+                <div className="absolute inset-0 bg-white/10 rounded-full blur-md group-hover:blur-lg transition-all"></div>
+                <svg
+                  className="w-8 h-8 relative"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </div>
+            </button>
+
+            {/* Navigation Buttons - Elegant */}
+            <button
+              onClick={() => navigatePreview("prev")}
+              className="absolute left-0 lg:-left-20 top-1/2 -translate-y-1/2 bg-white/5 hover:bg-white/10 backdrop-blur-md text-white rounded-full p-5 transition-all duration-300 z-20 hover:scale-110 border border-white/10 group"
+              aria-label="Previous image"
+            >
+              <svg
+                className="w-6 h-6 group-hover:-translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+
+            <button
+              onClick={() => navigatePreview("next")}
+              className="absolute right-0 lg:-right-20 top-1/2 -translate-y-1/2 bg-white/5 hover:bg-white/10 backdrop-blur-md text-white rounded-full p-5 transition-all duration-300 z-20 hover:scale-110 border border-white/10 group"
+              aria-label="Next image"
+            >
+              <svg
+                className="w-6 h-6 group-hover:translate-x-1 transition-transform"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+
+            {/* Image Container - Elegant Frame */}
+            <div className="relative bg-gradient-to-br from-pink-900/20 via-black/40 to-pink-800/20 backdrop-blur-sm rounded-3xl p-3 shadow-2xl border border-white/10">
+              <div className="relative aspect-[16/9] overflow-hidden rounded-2xl">
+                <img
+                  src={filteredProducts[currentPreviewIndex]?.image}
+                  alt={filteredProducts[currentPreviewIndex]?.name}
+                  className="w-full h-full object-contain animate-fadeIn"
+                  onError={handleImageError}
+                />
+              </div>
+
+              {/* Image Info Overlay - Refined */}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-10 rounded-b-2xl">
+                <div className="text-center">
+                  <h3 className="text-3xl md:text-4xl font-light text-white mb-2">
+                    {filteredProducts[currentPreviewIndex]?.name}
                   </h3>
-                  <p className="text-gray-600 mb-6">
-                    {selectedProduct.description}
-                  </p>
-                  <div className="text-4xl font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent mb-6">
-                    {formatIDR(selectedProduct.price)}
-                  </div>
-                </div>
-                
-                <div className="space-y-4">
-                  {selectedProduct.category === 'Money Bouquet' ? (
-                    <div className="p-4 rounded-xl bg-green-50 border border-green-100">
-                      <h4 className="font-semibold text-gray-800 mb-3">PEMBUATAN BUKET</h4>
-                      <div className="grid grid-cols-2 gap-2 text-sm mb-4">
-                        <div>10 lembar = Rp 100.000</div>
-                        <div>15 lembar = Rp 125.000</div>
-                        <div>20 lembar = Rp 150.000</div>
-                        <div>25 lembar = Rp 175.000</div>
-                        <div>30 lembar = Rp 200.000</div>
-                        <div>40 lembar = Rp 250.000</div>
-                        <div>50 lembar = Rp 350.000</div>
-                        <div>60 lembar = Rp 375.000</div>
-                      </div>
-                      <div className="border-t border-green-200 pt-3">
-                        <h5 className="font-medium mb-2">CONTOH</h5>
-                        <div className="text-sm space-y-2">
-                          <div className="p-2 bg-white rounded">
-                            <p>Pesan Total Uang Rp 200.000 pakai uang pecahan Rp 10.000</p>
-                            <p>→ Biaya jasa 20 lembar : Rp 150.000</p>
-                            <p>→ Jasa + Uang dalam buket = Rp 150.000 + Rp 200.000 = Rp 350.000</p>
-                          </div>
-                          <div className="p-2 bg-white rounded">
-                            <p>Pesan Total Uang Rp 3 Juta pakai uang pecahan Rp 100.000</p>
-                            <p>→ Biaya jasa 30 lembar : Rp 200.000</p>
-                            <p>→ Jasa + Uang dalam buket = Rp 200.000 + Rp 3.000.000 = Rp 3.200.000</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="p-4 rounded-xl bg-rose-50 border border-rose-100">
-                      <h4 className="font-semibold text-gray-800 mb-2">What's Included</h4>
-                      <ul className="space-y-2 text-gray-600">
-                        <li className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-rose-500" />
-                          Handcrafted floral arrangement
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-rose-500" />
-                          Premium seasonal flowers
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-rose-500" />
-                          Professional delivery available
-                        </li>
-                      </ul>
-                    </div>
-                  )}
-                  
-                  <div className="p-4 rounded-xl bg-pink-50 border border-pink-100">
-                    <h4 className="font-semibold text-gray-800 mb-2">Customization Options</h4>
-                    <p className="text-gray-600">
-                      Contact us to customize colors, size, or add personalized elements to this arrangement.
+                  <div className="flex items-center justify-center gap-2">
+                    <span className="w-8 h-px bg-pink-400/50"></span>
+                    <p className="text-sm text-white/70 uppercase tracking-wider font-light">
+                      {filteredProducts[currentPreviewIndex]?.category}
                     </p>
+                    <span className="w-8 h-px bg-pink-400/50"></span>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Bottom Controls - Refined */}
+            <div className="flex justify-between items-center mt-8 px-4">
+              {/* Counter Dots */}
+              <div className="flex gap-3">
+                {filteredProducts.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentPreviewIndex(idx)}
+                    className={`h-2 rounded-full transition-all duration-500 ${
+                      idx === currentPreviewIndex
+                        ? "w-10 bg-gradient-to-r from-pink-400 to-pink-500"
+                        : "w-2 bg-white/20 hover:bg-white/40"
+                    }`}
+                    aria-label={`Go to image ${idx + 1}`}
+                  />
+                ))}
+              </div>
+
+              {/* Counter */}
+              <div className="text-white/40 text-sm font-light">
+                {String(currentPreviewIndex + 1).padStart(2, "0")} /{" "}
+                {String(filteredProducts.length).padStart(2, "0")}
               </div>
             </div>
           </div>
         </div>
       )}
-    </div>
-  )
-}
 
-export default Gallery
+      {/* Styles */}
+      <style jsx>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes scaleIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
+        }
+
+        @keyframes floatDelayed {
+          0%,
+          100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-15px);
+          }
+        }
+
+        @keyframes floatSlow {
+          0%,
+          100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+
+        @keyframes pulseSlow {
+          0%,
+          100% {
+            opacity: 0.3;
+          }
+          50% {
+            opacity: 0.6;
+          }
+        }
+
+        .animate-fadeIn {
+          animation: fadeIn 0.5s ease-out;
+        }
+
+        .animate-fadeInUp {
+          opacity: 0;
+          animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .animate-scaleIn {
+          animation: scaleIn 0.5s ease-out;
+        }
+
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+
+        .animate-float-delayed {
+          animation: floatDelayed 7s ease-in-out infinite;
+        }
+
+        .animate-float-slow {
+          animation: floatSlow 8s ease-in-out infinite;
+        }
+
+        .animate-pulse-slow {
+          animation: pulseSlow 3s ease-in-out infinite;
+        }
+
+        .delay-1000 {
+          animation-delay: 1s;
+        }
+      `}</style>
+    </>
+  );
+};
+
+export default Gallery;

@@ -3,7 +3,6 @@ import NavBar from './components/NavBar'
 import Footer from './components/Footer'
 import Home from './pages/Home'
 import Gallery from './pages/Gallery'
-import Shop from './pages/Shop'
 import Contact from './pages/Contact'
 import About from './pages/About'
 
@@ -13,7 +12,6 @@ function App() {
   const renderPage = () => {
     switch (currentPage) {
       case 'shop':
-        return <Shop setCurrentPage={setCurrentPage} />
       case 'catalogues':
         return <Gallery setCurrentPage={setCurrentPage} />
       case 'contact':

@@ -47,6 +47,7 @@ export const generateProductsFromAssets = () => {
     id: number
     category: string
     image: string
+    name: string
   }> = []
   
   let productId = 1
@@ -54,11 +55,12 @@ export const generateProductsFromAssets = () => {
   categories.forEach(category => {
     const images = getImagesFromFolder(category)
     
-    Object.entries(images).forEach(([, imagePath]) => {
+    Object.entries(images).forEach(([fileName, imagePath]) => {
       products.push({
         id: productId++,
         category,
-        image: imagePath
+        image: imagePath,
+        name: fileName.replace(/\.(png|jpg|jpeg|webp)$/i, '')
       })
     })
   })
