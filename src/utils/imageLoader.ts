@@ -56,11 +56,15 @@ export const generateProductsFromAssets = () => {
     const images = getImagesFromFolder(category)
     
     Object.entries(images).forEach(([fileName, imagePath]) => {
+      const nameWithoutExt = fileName.replace(/\.(png|jpg|jpeg|webp)$/i, '')
+      const priceMatch = nameWithoutExt.match(/-\s*(\d+k)/i)
+      const displayName = priceMatch ? priceMatch[1] : nameWithoutExt
+      
       products.push({
         id: productId++,
         category,
         image: imagePath,
-        name: fileName.replace(/\.(png|jpg|jpeg|webp)$/i, '')
+        name: displayName
       })
     })
   })
