@@ -80,17 +80,7 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
           transform: scale(1);
         }
 
-        .hero-image-col::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(
-            105deg,
-            transparent 40%,
-            rgba(250, 246, 241, 0.6) 70%,
-            var(--cream) 100%
-          );
-        }
+    
 
         /* decorative arch frame */
         .arch-frame {
