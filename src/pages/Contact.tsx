@@ -98,11 +98,13 @@ const Contact: React.FC<ContactProps> = () => {
             </div>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-rose-600 via-pink-600 to-rose-600 bg-clip-text text-transparent">
-              Get In Touch
-            </span>
+          <h1 className="text-5xl sm:text-6xl md:text-7xl mb-6 tracking-tight">
+            <span className="font-serif text-gray-900">Get In</span>
+            <br />
+            <span className="font-serif italic text-gray-700">Touch</span>
           </h1>
+
+          <div className="w-24 h-[2px] bg-gray-900 mx-auto mt-4 mb-6"></div>
 
           <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Ready to bloom your space with everlasting beauty? Our floral

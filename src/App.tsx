@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import NavBar from './components/NavBar'
 import Footer from './components/Footer'
 import Home from './pages/Home'
@@ -8,6 +8,10 @@ import About from './pages/About'
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [currentPage])
 
   const renderPage = () => {
     switch (currentPage) {

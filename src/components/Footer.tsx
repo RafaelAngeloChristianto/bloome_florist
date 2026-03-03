@@ -60,11 +60,11 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
           <div>
             <h4 className="font-inter font-bold text-gray-800 mb-6 text-lg">Quick Links</h4>
             <ul className="space-y-4">
-              <li><button onClick={() => setCurrentPage?.('home')} className="font-inter text-gray-600 hover:text-rose-600 hover:translate-x-1 transition-all duration-200 text-left">Home</button></li>
-              <li><button onClick={() => setCurrentPage?.('about')} className="font-inter text-gray-600 hover:text-rose-600 hover:translate-x-1 transition-all duration-200 text-left">About Us</button></li>
-              <li><button onClick={() => setCurrentPage?.('catalogues')} className="font-inter text-gray-600 hover:text-rose-600 hover:translate-x-1 transition-all duration-200 text-left">Gallery</button></li>
-              <li><button onClick={() => setCurrentPage?.('contact')} className="font-inter text-gray-600 hover:text-rose-600 hover:translate-x-1 transition-all duration-200 text-left">Contact</button></li>
-              <li><button onClick={() => setCurrentPage?.('shop')} className="font-inter text-gray-600 hover:text-rose-600 hover:translate-x-1 transition-all duration-200 text-left">Shop</button></li>
+              <li><button onClick={() => { setCurrentPage?.('home'); window.scrollTo(0, 0); }} className="font-inter text-gray-600 hover:text-rose-600 hover:translate-x-1 transition-all duration-200 text-left">Home</button></li>
+              <li><button onClick={() => { setCurrentPage?.('about'); window.scrollTo(0, 0); }} className="font-inter text-gray-600 hover:text-rose-600 hover:translate-x-1 transition-all duration-200 text-left">About Us</button></li>
+              <li><button onClick={() => { setCurrentPage?.('catalogues'); window.scrollTo(0, 0); }} className="font-inter text-gray-600 hover:text-rose-600 hover:translate-x-1 transition-all duration-200 text-left">Gallery</button></li>
+              <li><button onClick={() => { setCurrentPage?.('contact'); window.scrollTo(0, 0); }} className="font-inter text-gray-600 hover:text-rose-600 hover:translate-x-1 transition-all duration-200 text-left">Contact</button></li>
+              <li><button onClick={() => { setCurrentPage?.('shop'); window.scrollTo(0, 0); }} className="font-inter text-gray-600 hover:text-rose-600 hover:translate-x-1 transition-all duration-200 text-left">Shop</button></li>
             </ul>
           </div>
 

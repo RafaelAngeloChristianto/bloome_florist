@@ -1,73 +1,117 @@
-import React from 'react'
-import logo from "../assets/logo.jpg"
+import React from "react";
+import { motion } from "framer-motion";
+import logo from "../assets/logo.jpg";
 
 interface AboutProps {
-  setCurrentPage?: (page: string) => void
+  setCurrentPage?: (page: string) => void;
 }
 
-const About: React.FC<AboutProps> = ({ setCurrentPage }) => {
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
 
+export default function About({ setCurrentPage }: AboutProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-pink-50 pt-20">
-      {/* Hero Section */}
-      <div className="relative py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            About
-            <span className="block bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
-              Bloome
-            </span>
-          </h1>
-          <p className="text-xl text-gray-600 mb-12 leading-relaxed">
-            For over a decade, we've been creating moments of beauty and joy through the art of floral design
+    <div className="min-h-screen bg-white pt-24 pb-24 px-6 mt-[50px]">
+      {/* Hero */}
+      <motion.section
+        initial="hidden"
+        animate="show"
+        variants={fadeUp}
+        className="max-w-5xl mx-auto text-center mb-24"
+      >
+        <h1 className="text-5xl md:text-6xl font-serif tracking-tight text-gray-900 mb-6">
+          About <span className="italic">Bloome</span>
+        </h1>
+
+        <div className="w-24 h-[2px] bg-gray-900 mx-auto mb-8" />
+
+        <p className="text-lg md:text-xl font-light text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          We design floral arrangements with intention, elegance, and attention
+          to detail — focusing purely on quality and craftsmanship.
+        </p>
+      </motion.section>
+
+      {/* Content Section */}
+      <motion.section
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        variants={fadeUp}
+        className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-20 items-center mb-28"
+      >
+        <div className="space-y-6">
+          <h2 className="text-3xl font-serif text-gray-900">Our Approach</h2>
+
+          <p className="text-gray-600 leading-relaxed font-light">
+            Every arrangement is thoughtfully composed to balance color,
+            texture, and proportion. We focus on creating pieces that feel
+            refined, timeless, and expressive without excess.
+          </p>
+
+          <p className="text-gray-600 leading-relaxed font-light">
+            From intimate celebrations to large-scale events, our team works
+            closely with clients to ensure each floral design complements the
+            moment perfectly.
           </p>
         </div>
-      </div>
 
-      <div className="max-w-6xl mx-auto px-6 pb-20">
-        {/* Story Section */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 border border-white/20 mb-16">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-6">Our Story</h2>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Founded in 2010 by master florist Sarah Johnson, Bloome began as a small neighborhood flower shop with a big dream: to bring the beauty and emotion of flowers into every special moment of life.
-              </p>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                What started as a passion project has grown into a premier floral design studio, serving thousands of customers and creating unforgettable arrangements for weddings, corporate events, and life's most precious celebrations.
-              </p>
-              <p className="text-gray-600 leading-relaxed">
-                Today, we continue to honor our founding principles of quality, creativity, and exceptional service while embracing new techniques and sustainable practices.
-              </p>
-            </div>
-            <div className="aspect-square rounded-3xl bg-gradient-to-br from-rose-100 to-pink-100 p-12 flex items-center justify-center">
-              <div className="w-32 h-32 rounded-full bg-white/50 backdrop-blur-sm flex items-center justify-center">
-                <img src={logo} alt="" />
-              </div>
-            </div>
-          </div>
-        </div>
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          transition={{ duration: 0.3 }}
+          className="relative"
+        >
+          <div className="absolute -top-6 -left-6 w-full h-full border border-gray-900" />
+          <img
+            src={logo}
+            alt="Bloome"
+            className="relative w-full h-[420px] object-cover"
+          />
+        </motion.div>
+      </motion.section>
 
-    
-
-        {/* Call to Action */}
-        <div className="mt-16 text-center">
-          <div className="bg-gradient-to-r from-rose-500 to-pink-500 rounded-3xl p-12 text-white">
-            <h2 className="text-3xl font-bold mb-4">Ready to Create Something Beautiful?</h2>
-            <p className="text-rose-100 mb-8 max-w-2xl mx-auto">
-              Let our experienced team help you create the perfect floral arrangement for your special occasion.
+      {/* Minimal Stats */}
+      <motion.section
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        variants={fadeUp}
+        className="max-w-4xl mx-auto grid md:grid-cols-3 gap-12 text-center mb-28"
+      >
+        {[
+          { number: "10+", label: "Years Experience" },
+          { number: "500+", label: "Happy Created" },
+          { number: "200+", label: "Flowers Styled" },
+        ].map((item, index) => (
+          <div key={index} className="space-y-3">
+            <h3 className="text-4xl font-serif text-gray-900">{item.number}</h3>
+            <p className="text-sm uppercase tracking-widest text-gray-500">
+              {item.label}
             </p>
-            <button 
-              onClick={() => setCurrentPage?.('shop')}
-              className="px-10 py-4 rounded-2xl text-lg font-semibold text-rose-600 bg-white hover:bg-gray-50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-            >
-              Start Your Order
-            </button>
           </div>
-        </div>
-      </div>
-    </div>
-  )
-}
+        ))}
+      </motion.section>
 
-export default About
+      {/* CTA */}
+      <motion.section
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        variants={fadeUp}
+        className="max-w-4xl mx-auto text-center"
+      >
+        <h2 className="text-3xl font-serif text-gray-900 mb-6">
+          Let’s Create Something Beautiful
+        </h2>
+
+        <button
+          onClick={() => setCurrentPage?.("shop")}
+          className="border border-gray-900 px-12 py-4 text-gray-900 tracking-wide hover:bg-gray-900 hover:text-white transition-all duration-300"
+        >
+          Explore Collection
+        </button>
+      </motion.section>
+    </div>
+  );
+}
