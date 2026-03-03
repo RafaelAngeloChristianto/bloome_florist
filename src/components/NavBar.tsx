@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react"
 import logo from "../assets/logo.jpg"
-import bouquetImage from "../assets/bouquet_homepage.jpeg"
+import bouquetImage from "../assets/2. Artificial Bouquet/Artificial 1 - 380k.jpeg"
 import { getAvailableCategories } from "../utils/imageLoader"
 
 interface NavBarProps {
