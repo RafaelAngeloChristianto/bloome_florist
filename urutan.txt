@@ -1,3 +1,7 @@
 1. Money bouquet
 2. bouquet
 3. Balloon Bouquet
+
+make category in order
+remove top left category
+add titik pemisah duit

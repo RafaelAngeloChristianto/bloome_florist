@@ -102,7 +102,7 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
     if (match) {
       const label = match[1].trim(); // may be empty if name was just "2k"
       const price = match[2].toUpperCase();
-      return { label, price };
+      return { label, price: `start from ${price}` };
     }
     // No price found — treat entire name as label
     return { label: name, price: null };
