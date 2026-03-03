@@ -5,3 +5,4 @@
 make category in order
 remove top left category
 add titik pemisah duit
+change to artificial instead of bouquet

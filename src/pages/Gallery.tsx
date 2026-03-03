@@ -214,13 +214,6 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
                           loading="lazy"
                         />
 
-                        {/* Category badge */}
-                        <div className="absolute top-3 left-3">
-                          <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-[11px] font-light text-pink-500 rounded-full border border-white/50 shadow-sm">
-                            {product.category}
-                          </span>
-                        </div>
-
                         {/* View overlay */}
                         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
                           <div className="bg-white/90 backdrop-blur-sm text-gray-800 text-xs px-4 py-2 rounded-full flex items-center gap-1.5 translate-y-2 group-hover:translate-y-0 transition-transform duration-400">
