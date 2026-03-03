@@ -180,6 +180,47 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
             </span>
           </div>
 
+          {/* Money Bouquet Pricing */}
+          {selectedCategory === "1. Money Bouquet" && (
+            <div className="mb-10 bg-white rounded-2xl border border-pink-100 p-6 shadow-sm">
+              <h3 className="text-lg font-serif text-gray-800 mb-4">Money Bouquet Pricing</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                <div className="flex justify-between p-3 bg-pink-50/50 rounded-lg">
+                  <span className="text-gray-600">10 lembar</span>
+                  <span className="font-medium text-gray-900">Rp. 100k</span>
+                </div>
+                <div className="flex justify-between p-3 bg-pink-50/50 rounded-lg">
+                  <span className="text-gray-600">15 lembar</span>
+                  <span className="font-medium text-gray-900">Rp. 125k</span>
+                </div>
+                <div className="flex justify-between p-3 bg-pink-50/50 rounded-lg">
+                  <span className="text-gray-600">20 lembar</span>
+                  <span className="font-medium text-gray-900">Rp. 150k</span>
+                </div>
+                <div className="flex justify-between p-3 bg-pink-50/50 rounded-lg">
+                  <span className="text-gray-600">25 lembar</span>
+                  <span className="font-medium text-gray-900">Rp. 175k</span>
+                </div>
+                <div className="flex justify-between p-3 bg-pink-50/50 rounded-lg">
+                  <span className="text-gray-600">30 lembar</span>
+                  <span className="font-medium text-gray-900">Rp. 200k</span>
+                </div>
+                <div className="flex justify-between p-3 bg-pink-50/50 rounded-lg">
+                  <span className="text-gray-600">40 lembar</span>
+                  <span className="font-medium text-gray-900">Rp. 250k</span>
+                </div>
+                <div className="flex justify-between p-3 bg-pink-50/50 rounded-lg">
+                  <span className="text-gray-600">50 lembar</span>
+                  <span className="font-medium text-gray-900">Rp. 350k</span>
+                </div>
+                <div className="flex justify-between p-3 bg-pink-50/50 rounded-lg">
+                  <span className="text-gray-600">60 lembar</span>
+                  <span className="font-medium text-gray-900">Rp. 375k</span>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Products Grid */}
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

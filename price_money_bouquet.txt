@@ -1,0 +1,8 @@
+10 lembar = Rp. 100k
+15 lembar = Rp. 125k
+20 lembar = Rp. 150k
+25 lembar = Rp. 175k
+30 lembar = Rp. 200k
+40 lembar = Rp. 250k
+50 lembar = Rp. 350k
+60 lembar = Rp. 375k
