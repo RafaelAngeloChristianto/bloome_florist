@@ -376,22 +376,22 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
       {/* Preview Modal */}
       {previewOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center md:p-4"
           onClick={() => setPreviewOpen(false)}
         >
-          <div className="absolute inset-0 bg-black/85 backdrop-blur-xl animate-fadeIn" />
+          <div className="absolute inset-0 bg-black/90 backdrop-blur-xl animate-fadeIn" />
 
           <div
-            className="relative w-full max-w-5xl mx-auto animate-scaleIn"
+            className="relative w-full h-full md:h-auto md:max-w-5xl mx-auto animate-scaleIn flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close */}
             <button
               onClick={() => setPreviewOpen(false)}
-              className="absolute -top-14 right-0 text-white/50 hover:text-white transition-colors z-20 p-2"
+              className="absolute top-4 right-4 md:-top-14 md:right-0 text-white/70 hover:text-white transition-colors z-20 p-3 md:p-2 bg-black/30 md:bg-transparent rounded-full backdrop-blur-sm"
             >
               <svg
-                className="w-7 h-7"
+                className="w-6 h-6 md:w-7 md:h-7"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -399,7 +399,7 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={1}
+                  strokeWidth={1.5}
                   d="M6 18L18 6M6 6l12 12"
                 />
               </svg>
@@ -408,10 +408,10 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
             {/* Nav Prev */}
             <button
               onClick={() => navigatePreview("prev")}
-              className="absolute left-0 lg:-left-16 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-full p-4 transition-all duration-300 z-20 hover:scale-110 border border-white/10"
+              className="absolute left-2 md:left-0 lg:-left-16 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-full p-3 md:p-4 transition-all duration-300 z-20 hover:scale-110 border border-white/10"
             >
               <svg
-                className="w-5 h-5"
+                className="w-5 h-5 md:w-6 md:h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -419,7 +419,7 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={1.5}
+                  strokeWidth={2}
                   d="M15 19l-7-7 7-7"
                 />
               </svg>
@@ -428,10 +428,10 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
             {/* Nav Next */}
             <button
               onClick={() => navigatePreview("next")}
-              className="absolute right-0 lg:-right-16 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-full p-4 transition-all duration-300 z-20 hover:scale-110 border border-white/10"
+              className="absolute right-2 md:right-0 lg:-right-16 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white rounded-full p-3 md:p-4 transition-all duration-300 z-20 hover:scale-110 border border-white/10"
             >
               <svg
-                className="w-5 h-5"
+                className="w-5 h-5 md:w-6 md:h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -439,27 +439,27 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={1.5}
+                  strokeWidth={2}
                   d="M9 5l7 7-7 7"
                 />
               </svg>
             </button>
 
             {/* Image */}
-            <div className="relative bg-white/5 rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-              <div className="aspect-[4/3] relative">
+            <div className="relative bg-white/5 md:rounded-2xl overflow-hidden border-0 md:border md:border-white/10 shadow-2xl flex-1 flex flex-col">
+              <div className="relative flex-1 flex items-center justify-center min-h-0">
                 <img
                   src={filteredProducts[currentPreviewIndex]?.image}
                   alt={filteredProducts[currentPreviewIndex]?.name}
-                  className="w-full h-full object-contain animate-fadeIn"
+                  className="w-full h-full object-contain animate-fadeIn max-h-[85vh] md:max-h-[70vh]"
                   onError={handleImageError}
                 />
               </div>
 
               {/* Info bar */}
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-8 pt-16 pb-8">
-                <div className="flex items-end justify-between">
-                  <div>
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent px-4 md:px-8 pt-12 md:pt-16 pb-4 md:pb-8">
+                <div className="flex items-end justify-between gap-3">
+                  <div className="flex-1 min-w-0">
                     {(() => {
                       const { label, price } = parseName(
                         filteredProducts[currentPreviewIndex]?.name ?? "",
@@ -467,14 +467,14 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
                       return (
                         <>
                           {label && (
-                            <p className="text-white/60 text-sm font-light mb-1">
+                            <p className="text-white/60 text-xs md:text-sm font-light mb-1 truncate">
                               {label}
                             </p>
                           )}
                           {price && (
-                            <p className="text-white font-serif text-4xl tracking-tight">
+                            <p className="text-white font-serif text-2xl md:text-4xl tracking-tight">
                               {price}{" "}
-                              <span className="text-white/50 text-lg font-light">
+                              <span className="text-white/50 text-sm md:text-lg font-light">
                                 IDR
                               </span>
                             </p>
@@ -483,7 +483,7 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
                       );
                     })()}
                   </div>
-                  <span className="text-white/40 text-xs bg-white/10 px-3 py-1.5 rounded-full border border-white/10">
+                  <span className="text-white/40 text-[10px] md:text-xs bg-white/10 px-2 md:px-3 py-1 md:py-1.5 rounded-full border border-white/10 whitespace-nowrap">
                     {filteredProducts[currentPreviewIndex]?.category}
                   </span>
                 </div>
@@ -491,21 +491,21 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
             </div>
 
             {/* Dots + counter */}
-            <div className="flex justify-between items-center mt-6 px-2">
-              <div className="flex gap-2">
+            <div className="flex justify-between items-center mt-3 md:mt-6 px-2 md:px-2">
+              <div className="flex gap-1.5 md:gap-2 overflow-x-auto max-w-[60%] scrollbar-hide">
                 {filteredProducts.map((_, idx) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentPreviewIndex(idx)}
-                    className={`h-1.5 rounded-full transition-all duration-400 ${
+                    className={`h-1 md:h-1.5 rounded-full transition-all duration-400 flex-shrink-0 ${
                       idx === currentPreviewIndex
-                        ? "w-8 bg-pink-400"
-                        : "w-1.5 bg-white/20 hover:bg-white/40"
+                        ? "w-6 md:w-8 bg-pink-400"
+                        : "w-1 md:w-1.5 bg-white/20 hover:bg-white/40"
                     }`}
                   />
                 ))}
               </div>
-              <span className="text-white/30 text-sm tabular-nums">
+              <span className="text-white/30 text-xs md:text-sm tabular-nums">
                 {String(currentPreviewIndex + 1).padStart(2, "0")} /{" "}
                 {String(filteredProducts.length).padStart(2, "0")}
               </span>
@@ -533,6 +533,8 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
           animation: fadeInUp 0.5s ease-out forwards;
         }
         .animate-scaleIn { animation: scaleIn 0.4s ease-out; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
     </>
   );
