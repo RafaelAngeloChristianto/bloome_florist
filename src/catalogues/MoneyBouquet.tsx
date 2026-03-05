@@ -10,12 +10,14 @@ const MoneyBouquet = () => {
     return numA - numB
   })
 
-  const products = sortedImages.map(([filename, imagePath], index) => ({
-    id: index + 1,
-    name: `Money Bouquet ${index + 1}`,
-    image: imagePath,
-    filename
-  }))
+  const products = sortedImages
+    .filter(([filename]) => !filename.startsWith('1 Pricelist'))
+    .map(([filename, imagePath], index) => ({
+      id: index + 1,
+      name: `Money Bouquet ${index + 1}`,
+      image: imagePath,
+      filename
+    }))
 
   const pricingOptions = [
     { sheets: 10, price: 'Rp 100.000' },

@@ -181,7 +181,7 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
           </div>
 
           {/* Money Bouquet Pricing */}
-          {selectedCategory === "1. Money Bouquet" && (
+          {/* {selectedCategory === "1. Money Bouquet" && (
             <div className="mb-10 bg-white rounded-2xl border border-pink-100 p-6 shadow-sm">
               <h3 className="text-lg font-serif text-gray-800 mb-4">Money Bouquet Pricing</h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
@@ -219,7 +219,7 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Products Grid */}
           {isLoading ? (
@@ -285,16 +285,16 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
                       {/* Info */}
                       <div className="p-4">
                         {label && (
-                          <p className="text-sm text-gray-500 font-light mb-1.5 truncate">
+                          <p className="text-base text-gray-700 font-medium mb-1 truncate">
                             {label}
                           </p>
                         )}
                         {price && (
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-2xl font-serif text-gray-900 tracking-tight">
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="text-xl font-medium text-pink-600">
                               {price}
                             </span>
-                            <span className="text-xs text-gray-400 font-light">
+                            <span className="text-xs text-gray-500">
                               IDR
                             </span>
                           </div>

@@ -62,7 +62,12 @@ export const generateProductsFromAssets = () => {
     Object.entries(images).forEach(([fileName, imagePath]) => {
       const nameWithoutExt = fileName.replace(/\.(png|jpg|jpeg|webp)$/i, '')
       const priceMatch = nameWithoutExt.match(/-\s*(\d+k)/i)
-      const displayName = priceMatch ? priceMatch[1] : nameWithoutExt
+      let displayName = priceMatch ? priceMatch[1] : nameWithoutExt
+      
+      // Remove leading "1 " from display name
+      displayName = displayName.replace(/^1\s+/, '')
+      // Remove patterns like "Money 5 - ", "Fresh 2 - ", etc.
+      displayName = displayName.replace(/^[A-Za-z]+\s+\d+\s*-\s*/, '')
       
       products.push({
         id: productId++,
