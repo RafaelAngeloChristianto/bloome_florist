@@ -6,10 +6,11 @@ import {
 
 interface GalleryProps {
   setCurrentPage?: (page: string) => void;
+  selectedCategory?: string;
 }
 
-const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
-  const [selectedCategory, setSelectedCategory] = useState("All");
+const Gallery: React.FC<GalleryProps> = ({ setCurrentPage, selectedCategory: initialCategory }) => {
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory || "All");
   const [categories, setCategories] = useState<string[]>(["All"]);
   const [products, setProducts] = useState<
     Array<{
@@ -24,6 +25,12 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage }) => {
   const [currentPreviewIndex, setCurrentPreviewIndex] = useState(0);
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (initialCategory) {
+      setSelectedCategory(initialCategory);
+    }
+  }, [initialCategory]);
 
   useEffect(() => {
     const availableCategories = getAvailableCategories();

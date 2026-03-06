@@ -37,11 +37,13 @@ export const getAvailableCategories = () => {
     console.error('Error getting available categories:', error)
   }
   
-  return Array.from(categories).sort((a, b) => {
-    const numA = parseInt(a.match(/^(\d+)\./)?.[1] || '999')
-    const numB = parseInt(b.match(/^(\d+)\./)?.[1] || '999')
-    return numA - numB
-  })
+  return Array.from(categories)
+    .sort((a, b) => {
+      const numA = parseInt(a.match(/^(\d+)\./)?.[1] || '999')
+      const numB = parseInt(b.match(/^(\d+)\./)?.[1] || '999')
+      return numA - numB
+    })
+    .map(cat => cat.replace(/^\d+\.\s*/, ''))
 }
 
 // Generate products from images in each category

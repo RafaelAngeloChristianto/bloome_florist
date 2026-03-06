@@ -8,6 +8,7 @@ import About from './pages/About'
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home')
+  const [selectedCategory, setSelectedCategory] = useState('All')
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -17,7 +18,7 @@ function App() {
     switch (currentPage) {
       case 'shop':
       case 'catalogues':
-        return <Gallery setCurrentPage={setCurrentPage} />
+        return <Gallery setCurrentPage={setCurrentPage} selectedCategory={selectedCategory} />
       case 'contact':
         return <Contact setCurrentPage={setCurrentPage} />
       case 'about':
@@ -29,7 +30,7 @@ function App() {
 
   return (
     <div className="App">
-      <NavBar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      <NavBar currentPage={currentPage} setCurrentPage={setCurrentPage} setSelectedCategory={setSelectedCategory} />
       {renderPage()}
       <Footer setCurrentPage={setCurrentPage} />
     </div>

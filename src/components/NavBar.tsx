@@ -6,9 +6,10 @@ import { getAvailableCategories } from "../utils/imageLoader"
 interface NavBarProps {
   currentPage: string
   setCurrentPage: (page: string) => void
+  setSelectedCategory: (category: string) => void
 }
 
-const NavBar: React.FC<NavBarProps> = ({ currentPage, setCurrentPage }) => {
+const NavBar: React.FC<NavBarProps> = ({ currentPage, setCurrentPage, setSelectedCategory }) => {
   const [isFlowersOpen, setIsFlowersOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMobileBouquetOpen, setIsMobileBouquetOpen] = useState(false)
@@ -75,11 +76,12 @@ const NavBar: React.FC<NavBarProps> = ({ currentPage, setCurrentPage }) => {
   }
 
   // Close mobile menu when changing page
-  const handlePageChange = (page: string) => {
+  const handlePageChange = (page: string, category?: string) => {
     setCurrentPage(page)
+    if (category) setSelectedCategory(category)
     setIsMobileMenuOpen(false)
     setIsMobileBouquetOpen(false)
-    setIsFlowersOpen(false) // Close dropdown on page change
+    setIsFlowersOpen(false)
   }
 
   return (
@@ -162,7 +164,7 @@ const NavBar: React.FC<NavBarProps> = ({ currentPage, setCurrentPage }) => {
                           {catalogueItems.map((item, idx) => (
                             <button 
                               key={idx} 
-                              onClick={() => handlePageChange('catalogues')}
+                              onClick={() => handlePageChange('catalogues', item.name)}
                               className="flex items-center gap-4 p-3 rounded-xl hover:bg-gradient-to-r hover:from-rose-50 hover:to-pink-50 transition-all duration-300 group hover:cursor-pointer"
                             >
                               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-100 to-rose-200 flex items-center justify-center group-hover:scale-110 transition-transform">
@@ -283,7 +285,7 @@ const NavBar: React.FC<NavBarProps> = ({ currentPage, setCurrentPage }) => {
                 {catalogueItems.map((item, idx) => (
                   <button 
                     key={idx} 
-                    onClick={() => handlePageChange('catalogues')}
+                    onClick={() => handlePageChange('catalogues', item.name)}
                     className="block w-full text-left text-gray-700 hover:text-rose-600 text-sm py-1.5 px-2 rounded hover:bg-rose-50 cursor-pointer"
                   >
                     {item.name}
