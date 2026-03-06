@@ -376,8 +376,6 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
 
           {/* ── TEXT COLUMN ── */}
           <div className="hero-text-col">
-            <div className="vert-text">Est. in love · Crafted by hand</div>
-
             <p className="eyebrow">
               <span className="eyebrow-line"></span>
               Floral Atelier
