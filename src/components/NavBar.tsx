@@ -258,8 +258,8 @@ const NavBar: React.FC<NavBarProps> = ({ currentPage, setCurrentPage, setSelecte
       </div>
 
       {/* MOBILE MENU */}
-      <div className={`lg:hidden overflow-hidden transition-all duration-300 ${isMobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
-        <div className="bg-white/95 backdrop-blur-md border-t border-gray-200 px-3 sm:px-6 py-4 space-y-3">
+      <div className={`lg:hidden transition-all duration-300 ${isMobileMenuOpen ? "max-h-[calc(100vh-4rem)] opacity-100" : "max-h-0 opacity-0"} overflow-hidden`}>
+        <div className="bg-white/95 backdrop-blur-md border-t border-gray-200 px-3 sm:px-6 py-4 space-y-3 overflow-y-auto max-h-[calc(100vh-4rem)]">
           <button 
             onClick={() => handlePageChange('home')}
             className={`block w-full text-left py-2 text-sm rounded-lg hover:bg-rose-50 px-2 ${
@@ -280,7 +280,7 @@ const NavBar: React.FC<NavBarProps> = ({ currentPage, setCurrentPage, setSelecte
               </svg>
             </button>
 
-            <div className={`overflow-hidden transition-all duration-200 ${isMobileBouquetOpen ? "max-h-64 opacity-100" : "max-h-0 opacity-0"}`}>
+            <div className={`transition-all duration-200 ${isMobileBouquetOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"} overflow-y-auto`}>
               <div className="mt-2 ml-4 space-y-2 border-l-2 border-rose-100 pl-3">
                 {catalogueItems.map((item, idx) => (
                   <button 
