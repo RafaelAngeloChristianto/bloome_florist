@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   getAvailableCategories,
   generateProductsFromAssets,
@@ -25,6 +25,7 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage, selectedCategory: ini
   const [currentPreviewIndex, setCurrentPreviewIndex] = useState(0);
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [isLoading, setIsLoading] = useState(true);
+  const productsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (initialCategory) {
@@ -48,6 +49,10 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage, selectedCategory: ini
             (product) => product.category.trim() === selectedCategory.trim(),
           );
     setFilteredProducts(filtered);
+    
+    if (window.innerWidth < 768 && productsRef.current) {
+      productsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }, [selectedCategory, products]);
 
   useEffect(() => {
@@ -229,6 +234,7 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage, selectedCategory: ini
           )} */}
 
           {/* Products Grid */}
+          <div ref={productsRef}>
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (
@@ -339,6 +345,7 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage, selectedCategory: ini
               </button>
             </div>
           )}
+          </div>
 
           {/* CTA */}
           <div className="mt-24 relative bg-white rounded-3xl border border-pink-100 shadow-sm overflow-hidden">
