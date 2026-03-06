@@ -5,7 +5,7 @@ import Footer from '../components/Footer'
 export const HomeScreen: React.FC = () => {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-rose-50">
-            <NavBar currentPage="home" setCurrentPage={() => {}} />
+            <NavBar currentPage="home" setCurrentPage={() => {}} setSelectedCategory={() => {}} />
             
             {/* Hero Section */}
             <section className="py-20 px-6 relative min-h-screen flex items-center">
