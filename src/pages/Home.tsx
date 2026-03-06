@@ -329,31 +329,6 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
           color: var(--rose);
           font-weight: 300;
         }
-
-        /* ── BACKGROUND DECORATIVE CIRCLES ── */
-        .deco-circle {
-          position: absolute;
-          border-radius: 50%;
-          pointer-events: none;
-        }
-
-        .deco-circle-1 {
-          width: 400px;
-          height: 400px;
-          border: 1px solid rgba(196, 120, 106, 0.08);
-          top: -100px;
-          right: 45%;
-          z-index: 1;
-        }
-
-        .deco-circle-2 {
-          width: 200px;
-          height: 200px;
-          border: 1px solid rgba(138, 158, 138, 0.12);
-          bottom: 80px;
-          right: 6%;
-          z-index: 1;
-        }
       `}</style>
 
       <div className="hero-root" ref={heroRef}>
@@ -406,12 +381,6 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
               </button>
             </div>
           </div>
-        </div>
-
-        {/* Scroll cue */}
-        <div className="scroll-cue">
-          <span>Scroll</span>
-          <div className="scroll-cue-line"></div>
         </div>
       </div>
     </>
