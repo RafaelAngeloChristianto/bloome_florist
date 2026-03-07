@@ -139,7 +139,7 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage, selectedCategory: ini
               </p>
 
               <h1 className="font-serif text-[clamp(3.5rem,10vw,7rem)] leading-none text-gray-900 mb-6">
-                Floral <em className="text-pink-400 not-italic">Gallery</em>
+                Flower <em className="text-pink-400 not-italic">Gallery</em>
               </h1>
 
               <p className="text-gray-500 text-lg max-w-xl mx-auto font-light leading-relaxed">
@@ -164,20 +164,32 @@ const Gallery: React.FC<GalleryProps> = ({ setCurrentPage, selectedCategory: ini
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-6 pb-24">
           {/* Category Filter */}
-          <div className="mb-14 flex flex-wrap gap-2.5 justify-center">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-5 py-2 text-sm rounded-full border transition-all duration-300 font-light ${
-                  selectedCategory === category
-                    ? "bg-pink-500 text-white border-pink-500 shadow-md shadow-pink-200"
-                    : "bg-white text-gray-500 border-gray-200 hover:border-pink-300 hover:text-pink-500"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+          <div className="mb-16 relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-pink-50 via-white to-rose-50 rounded-3xl blur-2xl opacity-60" />
+            <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl border border-pink-200 shadow-xl p-10">
+              <div className="text-center mb-8">
+                <p className="text-xs uppercase tracking-[0.3em] text-pink-400 mb-2 font-light">Explore</p>
+                <h3 className="text-2xl font-serif text-gray-800">Browse by Category</h3>
+              </div>
+              <div className="flex flex-wrap gap-4 justify-center max-w-5xl mx-auto">
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`px-8 py-4 text-base rounded-2xl border-2 transition-all duration-300 font-medium relative overflow-hidden group ${
+                      selectedCategory === category
+                        ? "bg-gradient-to-r from-pink-500 to-rose-500 text-white border-transparent shadow-xl shadow-pink-300/50 scale-105"
+                        : "bg-white text-gray-700 border-gray-200 hover:border-pink-300 hover:text-pink-600 hover:shadow-lg hover:-translate-y-0.5"
+                    }`}
+                  >
+                    {selectedCategory !== category && (
+                      <span className="absolute inset-0 bg-gradient-to-r from-pink-50 to-rose-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    )}
+                    <span className="relative">{category}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Section Label */}

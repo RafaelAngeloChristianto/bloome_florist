@@ -358,7 +358,7 @@ const Home: React.FC<HomeProps> = ({ setCurrentPage }) => {
 
             <h1 className="hero-title">
               Where flowers
-              <em>speak</em>
+              <em>bloom</em>
             </h1>
 
             <p className="hero-desc">
