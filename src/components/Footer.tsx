@@ -106,7 +106,7 @@ export const Footer: React.FC<FooterProps> = ({ setCurrentPage }) => {
         <div className="border-t border-rose-200 pt-8 flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center space-x-2 mb-4 md:mb-0">
             <p className="font-inter text-gray-500 text-sm">
-              © 2024 Bloome Flowers. Made with
+              © 2026 Bloome Flowers. Made with
             </p>
             <span className="text-rose-500 animate-pulse">💕</span>
             <p className="font-inter text-gray-500 text-sm">in Indonesia</p>
